@@ -14,8 +14,12 @@ impl LinkAdapter {
         let link = AblLink::new(120.0);
         let state = SessionState::new();
 
-        info!("Enabling Ableton Link");
+        info!("Enabling Link");
         link.enable(true);
+
+        link.set_num_peers_callback(move |peers| {
+            info!(peers, "Link updated");
+        });
 
         Self { link, state }
     }
@@ -52,7 +56,7 @@ impl LinkAdapter {
 
 impl Drop for LinkAdapter {
     fn drop(&mut self) {
-        info!("Disabling Ableton Link");
+        info!("Disabling Link");
         self.link.enable(false);
     }
 }
