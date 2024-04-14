@@ -1,7 +1,7 @@
 [package]
 name = "midilink"
 version = "0.0.2"
-description = "Placeholder crate, coming soon..."
+description = "Mixxx MIDI to Ableton Link adapter"
 edition = "2021"
 license = "GPL-3.0"
 repository = "https://github.com/fwcd/midilink"
