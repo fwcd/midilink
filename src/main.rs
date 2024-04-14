@@ -26,8 +26,11 @@ fn main() -> Result<()> {
     let link = AblLink::new(120.0);
     let mut state = SessionState::new();
 
-    info!(name = %args.name, "Creating virtual MIDI ports");
+    info!("Enabling Ableton Link");
+    link.enable(true);
+    // TODO: Use Drop to .enable(false) once the app is quit
 
+    info!(name = %args.name, "Creating virtual MIDI ports");
     let midi_in = MidiInput::new("MIDILink input")?;
     let _conn_in = midi_in.create_virtual(
         &args.name,
