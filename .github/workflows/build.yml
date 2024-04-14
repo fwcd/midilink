@@ -13,7 +13,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # TODO: Add macos-latest to matrix
 
     steps:
     - uses: actions/checkout@v4
