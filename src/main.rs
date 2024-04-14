@@ -6,8 +6,9 @@ use std::thread;
 use anyhow::{anyhow, Result};
 use clap::Parser;
 use midir::{os::unix::{VirtualInput, VirtualOutput}, MidiInput, MidiOutput};
-use midly::live::LiveEvent;
-use tracing::{info, warn};
+use midly::{live::LiveEvent, MidiMessage};
+use rusty_link::{AblLink, SessionState};
+use tracing::{info, trace, warn};
 
 #[derive(Parser)]
 #[command(version)]
@@ -22,6 +23,8 @@ fn main() -> Result<()> {
     _ = dotenvy::dotenv();
 
     let args = Args::parse();
+    let link = AblLink::new(120.0);
+    let mut state = SessionState::new();
 
     info!(name = %args.name, "Creating virtual MIDI ports");
 
@@ -31,7 +34,23 @@ fn main() -> Result<()> {
         move |_stamp, raw, _| {
             // TODO: Factor this whole callback into a Result-returning function
             match LiveEvent::parse(raw) {
-                Ok(event) => info!(?event, "Received"),
+                Ok(event) => match event {
+                    LiveEvent::Midi { channel: _, message: MidiMessage::NoteOn { key, vel } } => {
+                        // See https://github.com/mixxxdj/mixxx/wiki/MIDI%20clock%20output
+                        match key.as_int() {
+                            // BPM
+                            52 => {
+                                let bpm = (vel.as_int() + 50) as f64;
+                                info!(bpm, "Setting BPM");
+                                link.capture_audio_session_state(&mut state);
+                                state.set_tempo(bpm, 0);
+                                link.commit_audio_session_state(&state);
+                            },
+                            _ => trace!(?event, "Ignoring MIDI note event"),
+                        }
+                    },
+                    _ => trace!(?event, "Ignoring MIDI event"),
+                },
                 Err(err) => warn!(?err, "Could not parse MIDI event"),
             }
         },
