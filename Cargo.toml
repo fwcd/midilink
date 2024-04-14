@@ -1,0 +1,11 @@
+[package]
+name = "midilink"
+version = "0.0.1"
+description = "Mixxx MIDI to Ableton Link adapter"
+edition = "2021"
+license = "GPL-3.0"
+repository = "https://github.com/fwcd/midilink"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
