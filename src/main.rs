@@ -3,7 +3,7 @@ compile_error!("MIDILink currently requires a Unix-like platform (e.g. macOS or 
 
 mod adapter;
 
-use std::thread;
+use std::{sync::{atomic::{AtomicBool, Ordering}, Arc}, thread};
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
@@ -46,7 +46,21 @@ fn main() -> Result<()> {
 
     info!("Waiting for input...");
 
-    loop {
+    let running = Arc::new(AtomicBool::new(true));
+
+    {
+        let running = running.clone();
+        let main_thread = thread::current();
+        ctrlc::set_handler(move || {
+            running.store(false, Ordering::SeqCst);
+            main_thread.unpark();
+        })?;
+    }
+
+    while running.load(Ordering::SeqCst) {
         thread::park();
     }
+
+    info!("Exiting...");
+    Ok(())
 }
