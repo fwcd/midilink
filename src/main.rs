@@ -6,7 +6,8 @@ use std::thread;
 use anyhow::{anyhow, Result};
 use clap::Parser;
 use midir::{os::unix::{VirtualInput, VirtualOutput}, MidiInput, MidiOutput};
-use tracing::info;
+use midly::live::LiveEvent;
+use tracing::{info, warn};
 
 #[derive(Parser)]
 #[command(version)]
@@ -27,8 +28,12 @@ fn main() -> Result<()> {
     let midi_in = MidiInput::new("MIDILink input")?;
     let _conn_in = midi_in.create_virtual(
         &args.name,
-        move |stamp, message, _| {
-            info!(stamp, ?message, "Received");
+        move |_stamp, raw, _| {
+            // TODO: Factor this whole callback into a Result-returning function
+            match LiveEvent::parse(raw) {
+                Ok(event) => info!(?event, "Received"),
+                Err(err) => warn!(?err, "Could not parse MIDI event"),
+            }
         },
         ()
     ).map_err(|e| anyhow!("Could not create virtual input: {}", e))?;
