@@ -37,18 +37,19 @@ impl LinkAdapter {
                 // See https://github.com/mixxxdj/mixxx/wiki/MIDI%20clock%20output
                 match key.as_int() {
                     // Beat
-                    50 => {
-                        let beat = (vel.as_int() % 4) as f64;
-                        info!(beat, "Setting beat");
-                        self.update_state(|state| state.force_beat_at_time(beat, stamp, 0.0));
+                    50 if vel == 100 => {
+                        info!(stamp, "Setting beat");
+                        let beat = 0.0;
+                        let quantum = 1.0;
+                        self.update_state(|state| state.force_beat_at_time(beat, stamp, quantum));
                     },
                     // BPM
                     52 => {
-                        let bpm = (vel.as_int() + 50) as f64;
+                        let bpm = vel.as_int() + 50;
                         info!(bpm, "Setting BPM");
                         self.update_state(|state| {
-                            if state.tempo() != bpm {
-                                state.set_tempo(bpm, 0);
+                            if state.tempo() != bpm as f64 {
+                                state.set_tempo(bpm as f64, 0);
                             }
                         });
                     },
