@@ -38,9 +38,15 @@ impl LinkAdapter {
                 match key.as_int() {
                     // Beat
                     50 if vel == 100 => {
-                        info!(stamp, "Setting beat");
+                        // Mixxx does not expose a concept of bars, therefore
+                        // we'll just use a quantum of 1 (i.e. a single beat).
+                        // We 'rudely' force the beat to unidirectionally bridge
+                        // the Mixxx clock into the Link session. This also
+                        // implies that only a single MIDIlink instance should
+                        // run per session.
                         let beat = 0.0;
                         let quantum = 1.0;
+                        info!(stamp, "Setting beat");
                         self.update_state(|state| state.force_beat_at_time(beat, stamp, quantum));
                     },
                     // BPM
