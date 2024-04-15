@@ -56,7 +56,7 @@ impl LinkAdapter {
                         info!(bpm, "Setting BPM");
                         self.update_state(|state| {
                             if state.tempo() != bpm as f64 {
-                                state.set_tempo(bpm as f64, 0);
+                                state.set_tempo(bpm as f64, stamp as i64);
                             }
                         });
                     },
