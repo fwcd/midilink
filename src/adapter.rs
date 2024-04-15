@@ -54,11 +54,7 @@ impl LinkAdapter {
                     52 => {
                         let bpm = vel.as_int() + 50;
                         info!(bpm, "Setting BPM");
-                        self.update_state(|state| {
-                            if state.tempo() != bpm as f64 {
-                                state.set_tempo(bpm as f64, stamp as i64);
-                            }
-                        });
+                        self.update_state(|state| state.set_tempo(bpm as f64, stamp as i64));
                     },
                     _ => trace!(?event, "Ignoring MIDI note event"),
                 }
