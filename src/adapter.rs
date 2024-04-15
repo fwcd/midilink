@@ -40,6 +40,7 @@ impl LinkAdapter {
                     50 if vel == 100 => {
                         // Mixxx does not expose a concept of bars, therefore
                         // we'll just use a quantum of 1 (i.e. a single beat).
+                        // See https://ableton.github.io/link for details.
                         // We 'rudely' force the beat to unidirectionally bridge
                         // the Mixxx clock into the Link session. This also
                         // implies that only a single MIDIlink instance should
