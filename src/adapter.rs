@@ -25,24 +25,32 @@ impl LinkAdapter {
     }
 
     /// Handles an incoming MIDI event in raw form.
-    pub fn handle_raw_event(&mut self, raw: &[u8]) -> Result<()> {
+    pub fn handle_raw_event(&mut self, stamp: u64, raw: &[u8]) -> Result<()> {
         let event = LiveEvent::parse(raw).context("Could not parse MIDI event")?;
-        self.handle_event(event)
+        self.handle_event(stamp, event)
     }
 
     /// Handles an incoming MIDI event.
-    pub fn handle_event(&mut self, event: LiveEvent) -> Result<()> {
+    pub fn handle_event(&mut self, stamp: u64, event: LiveEvent) -> Result<()> {
         match event {
             LiveEvent::Midi { channel: _, message: MidiMessage::NoteOn { key, vel } } => {
                 // See https://github.com/mixxxdj/mixxx/wiki/MIDI%20clock%20output
                 match key.as_int() {
+                    // Beat
+                    50 => {
+                        let beat = (vel.as_int() % 4) as f64;
+                        info!(beat, "Setting beat");
+                        self.update_state(|state| state.force_beat_at_time(beat, stamp, 0.0));
+                    },
                     // BPM
                     52 => {
                         let bpm = (vel.as_int() + 50) as f64;
                         info!(bpm, "Setting BPM");
-                        self.link.capture_audio_session_state(&mut self.state);
-                        self.state.set_tempo(bpm, 0);
-                        self.link.commit_audio_session_state(&self.state);
+                        self.update_state(|state| {
+                            if state.tempo() != bpm {
+                                state.set_tempo(bpm, 0);
+                            }
+                        });
                     },
                     _ => trace!(?event, "Ignoring MIDI note event"),
                 }
@@ -51,6 +59,12 @@ impl LinkAdapter {
         }
 
         Ok(())
+    }
+
+    fn update_state(&mut self, action: impl FnOnce(&mut SessionState)) {
+        self.link.capture_audio_session_state(&mut self.state);
+        action(&mut self.state);
+        self.link.commit_audio_session_state(&mut self.state);
     }
 }
 

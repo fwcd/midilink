@@ -31,8 +31,8 @@ fn main() -> Result<()> {
     let midi_in = MidiInput::new("MIDILink input")?;
     let _conn_in = midi_in.create_virtual(
         &args.name,
-        move |_stamp, raw, _| {
-            let result = adapter.handle_raw_event(raw);
+        move |stamp, raw, _| {
+            let result = adapter.handle_raw_event(stamp, raw);
             if let Err(e) = result {
                 warn!(%e, "Error while handling event");
             }
