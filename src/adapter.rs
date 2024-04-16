@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use midly::{live::LiveEvent, MidiMessage};
 use rusty_link::{AblLink, SessionState};
-use tracing::{info, trace};
+use tracing::{debug, info, trace};
 
 pub struct LinkAdapter {
     link: AblLink,
@@ -57,10 +57,10 @@ impl LinkAdapter {
                         info!(bpm, "Setting BPM");
                         self.update_state(|state| state.set_tempo(bpm as f64, stamp as i64));
                     },
-                    _ => trace!(?event, "Ignoring MIDI note event"),
+                    _ => debug!(?event, "Ignoring MIDI note event"),
                 }
             },
-            _ => trace!(?event, "Ignoring MIDI event"),
+            _ => debug!(?event, "Ignoring MIDI event"),
         }
 
         Ok(())
