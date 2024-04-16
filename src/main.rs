@@ -9,6 +9,7 @@ use anyhow::{anyhow, Result};
 use clap::Parser;
 use midir::{os::unix::{VirtualInput, VirtualOutput}, MidiInput, MidiOutput};
 use tracing::{info, warn};
+use tracing_subscriber::EnvFilter;
 
 use crate::adapter::LinkAdapter;
 
@@ -21,7 +22,7 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt().with_env_filter(EnvFilter::from_default_env()).init();
     _ = dotenvy::dotenv();
 
     let args = Args::parse();
