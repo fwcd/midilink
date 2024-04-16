@@ -32,6 +32,7 @@ impl LinkAdapter {
 
     /// Handles an incoming MIDI event.
     pub fn handle_event(&mut self, stamp: u64, event: LiveEvent) -> Result<()> {
+        trace!(?event, "Handling");
         match event {
             LiveEvent::Midi { channel: _, message: MidiMessage::NoteOn { key, vel } } => {
                 // See https://github.com/mixxxdj/mixxx/wiki/MIDI%20clock%20output
