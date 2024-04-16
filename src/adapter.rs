@@ -38,7 +38,7 @@ impl LinkAdapter {
                 // See https://github.com/mixxxdj/mixxx/wiki/MIDI%20clock%20output
                 match key.as_int() {
                     // Beat
-                    50 if vel == 100 => {
+                    0x32 if vel == 100 => {
                         // Mixxx does not expose a concept of bars, therefore
                         // we'll just use a quantum of 1 (i.e. a single beat).
                         // See https://ableton.github.io/link for details.
@@ -52,7 +52,7 @@ impl LinkAdapter {
                         self.update_state(|state| state.force_beat_at_time(beat, stamp, quantum));
                     },
                     // BPM
-                    52 => {
+                    0x34 => {
                         let bpm = vel.as_int() + 50;
                         info!(bpm, "Setting BPM");
                         self.update_state(|state| state.set_tempo(bpm as f64, stamp as i64));
