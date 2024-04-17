@@ -8,7 +8,7 @@ use std::{sync::{atomic::{AtomicBool, Ordering}, Arc}, thread};
 use anyhow::{anyhow, Result};
 use clap::Parser;
 use midir::{os::unix::{VirtualInput, VirtualOutput}, MidiInput, MidiOutput};
-use tracing::{info, warn};
+use tracing::{info, level_filters::LevelFilter, warn};
 use tracing_subscriber::EnvFilter;
 
 use crate::adapter::LinkAdapter;
