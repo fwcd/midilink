@@ -22,7 +22,9 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    tracing_subscriber::fmt().with_env_filter(EnvFilter::from_default_env()).init();
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::builder().with_default_directive(LevelFilter::INFO.into()).from_env()?)
+        .init();
     _ = dotenvy::dotenv();
 
     let args = Args::parse();
