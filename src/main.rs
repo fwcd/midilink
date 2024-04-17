@@ -22,10 +22,11 @@ struct Args {
 }
 
 fn main() -> Result<()> {
+    _ = dotenvy::dotenv();
+
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::builder().with_default_directive(LevelFilter::INFO.into()).from_env()?)
         .init();
-    _ = dotenvy::dotenv();
 
     let args = Args::parse();
     let mut adapter = LinkAdapter::new();
